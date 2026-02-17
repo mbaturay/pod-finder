@@ -1,0 +1,99 @@
+import { motion } from 'framer-motion';
+import { Button } from './Button';
+
+interface IntroScreenProps {
+  onStart: () => void;
+}
+
+export function IntroScreen({ onStart }: IntroScreenProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-3xl mx-auto"
+    >
+      <div className="card">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+            POD Finder
+          </h1>
+          <p className="text-lg text-slate-600">
+            Discover which area of contribution best matches your interests
+          </p>
+        </div>
+
+        <div className="space-y-6 mb-8">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-800 mb-3">
+              About This Survey
+            </h2>
+            <p className="text-slate-600 leading-relaxed">
+              This survey helps you identify where you can make the most meaningful contribution.
+              You'll rate your interest in different types of activities across four areas:
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[
+              {
+                title: 'Area 1: Grow Our Craft',
+                description: 'Teaching, coaching, and building internal capability',
+              },
+              {
+                title: 'Area 2: Shape the Story',
+                description: 'Research, narratives, and client-facing materials',
+              },
+              {
+                title: 'Area 3: Strengthen Our Team',
+                description: 'Community building and team connection',
+              },
+              {
+                title: 'Area 4: Scale Delivery Excellence',
+                description: 'Templates, standards, and process improvements',
+              },
+            ].map((area) => (
+              <div
+                key={area.title}
+                className="bg-gradient-to-br from-primary-50 to-blue-50 p-4 rounded-lg border border-primary-100"
+              >
+                <h3 className="font-semibold text-slate-800 mb-1">{area.title}</h3>
+                <p className="text-sm text-slate-600">{area.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-slate-800 mb-2">How it works:</h3>
+            <ol className="list-decimal list-inside space-y-2 text-slate-700">
+              <li>Rate your interest in each area (1–5 scale)</li>
+              <li>Answer detailed questions for areas that interest you</li>
+              <li>Choose your top 2 area preferences</li>
+              <li>Get your personalized recommendation</li>
+            </ol>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <h3 className="font-semibold text-slate-800 mb-2">Rating Scale:</h3>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-600">1 = Not at all like me</span>
+              <span className="text-slate-400">→</span>
+              <span className="text-slate-600">5 = Very much like me</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              If you rate an area 1 or 2, you'll skip its detailed questions.
+            </p>
+          </div>
+        </div>
+
+        <div className="text-center">
+          <Button onClick={onStart} className="px-8 py-3 text-lg">
+            Get Started
+          </Button>
+          <p className="text-xs text-slate-500 mt-3">Takes about 5 minutes</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
