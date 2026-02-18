@@ -24,10 +24,10 @@ export function TopLevelInterest({ state, onUpdate, onNext, onBack }: TopLevelIn
     >
       <div className="card">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
             Rate Your Interest
           </h2>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             For each area, rate how interested you are in contributing to these types of activities.
           </p>
         </div>
@@ -42,13 +42,13 @@ export function TopLevelInterest({ state, onUpdate, onNext, onBack }: TopLevelIn
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: parseInt(podId.slice(-1)) * 0.1 }}
-                className="bg-slate-50 p-5 rounded-lg border border-slate-200"
+                className="bg-muted p-5 rounded-lg border border-border"
               >
                 <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {area.areaLabel} — {area.areaName}
                   </h3>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {area.areaDescription}
                   </p>
                 </div>
@@ -74,7 +74,7 @@ export function TopLevelInterest({ state, onUpdate, onNext, onBack }: TopLevelIn
         </div>
 
         {!isComplete && (
-          <p className="text-sm text-amber-600 text-center mt-4">
+          <p className="text-sm text-warning text-center mt-4">
             Please rate all areas to continue
           </p>
         )}

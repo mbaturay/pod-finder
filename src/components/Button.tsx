@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'ghost';
   children: ReactNode;
   className?: string;
   onClick?: () => void;
@@ -11,17 +11,20 @@ interface ButtonProps {
 }
 
 export function Button({ variant = 'primary', children, className = '', onClick, disabled, type = 'button' }: ButtonProps) {
-  const baseClasses = 'btn';
-  const variantClass = variant === 'primary' ? 'btn-primary' : 'btn-secondary';
+  const variantClass = {
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    ghost: 'btn-ghost',
+  }[variant];
 
   return (
     <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`${baseClasses} ${variantClass} ${className}`}
+      whileHover={disabled ? {} : { scale: 1.02 }}
+      whileTap={disabled ? {} : { scale: 0.98 }}
+      className={`btn ${variantClass} ${className}`}
     >
       {children}
     </motion.button>

@@ -19,13 +19,13 @@ export function LikertScale({ label, value, onChange, required = false }: Likert
 
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-slate-700 mb-3">
+      <label className="block text-sm font-medium text-foreground mb-3">
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className="text-destructive ml-1">*</span>}
       </label>
 
       <div className="flex items-center gap-2">
-        <span className="text-xs text-slate-500 hidden sm:inline">Not at all like me</span>
+        <span className="text-xs text-muted-foreground hidden sm:inline">Not at all like me</span>
 
         <div className="flex gap-2 flex-1 justify-center">
           {options.map((option) => {
@@ -38,8 +38,8 @@ export function LikertScale({ label, value, onChange, required = false }: Likert
                 onClick={() => onChange(option.value)}
                 className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg font-medium text-sm sm:text-base transition-all duration-200 ${
                   isSelected
-                    ? 'bg-primary-600 text-white shadow-lg scale-110'
-                    : 'bg-white border-2 border-slate-300 text-slate-700 hover:border-primary-400'
+                    ? 'bg-cta text-primary-foreground shadow-lg scale-110'
+                    : 'bg-card border-2 border-border text-foreground hover:border-primary'
                 }`}
                 whileHover={{ scale: isSelected ? 1.1 : 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -51,11 +51,11 @@ export function LikertScale({ label, value, onChange, required = false }: Likert
           })}
         </div>
 
-        <span className="text-xs text-slate-500 hidden sm:inline">Very much like me</span>
+        <span className="text-xs text-muted-foreground hidden sm:inline">Very much like me</span>
       </div>
 
       {/* Mobile labels */}
-      <div className="flex justify-between mt-2 text-xs text-slate-500 sm:hidden">
+      <div className="flex justify-between mt-2 text-xs text-muted-foreground sm:hidden">
         <span>Not at all like me</span>
         <span>Very much like me</span>
       </div>

@@ -35,10 +35,10 @@ export function TopTwoPriorities({
     >
       <div className="card">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 mb-2">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
             Your Top 2 Priorities
           </h2>
-          <p className="text-slate-600">
+          <p className="text-muted-foreground">
             Choose the two areas you most want to contribute to, in order of preference.
           </p>
         </div>
@@ -46,9 +46,9 @@ export function TopTwoPriorities({
         <div className="space-y-8">
           {/* First Choice */}
           <div>
-            <label className="block text-lg font-semibold text-slate-800 mb-4">
+            <label className="block text-lg font-semibold text-foreground mb-4">
               First Choice
-              <span className="text-red-500 ml-1">*</span>
+              <span className="text-destructive ml-1">*</span>
             </label>
 
             <div className="grid sm:grid-cols-2 gap-3">
@@ -65,22 +65,22 @@ export function TopTwoPriorities({
                     disabled={isDisabled}
                     className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                       isSelected
-                        ? 'border-primary-600 bg-primary-50 shadow-md'
+                        ? 'border-primary bg-primary-soft shadow-md'
                         : isDisabled
-                        ? 'border-slate-200 bg-slate-100 opacity-50 cursor-not-allowed'
-                        : 'border-slate-300 bg-white hover:border-primary-400'
+                        ? 'border-border bg-muted opacity-50 cursor-not-allowed'
+                        : 'border-border bg-card hover:border-primary'
                     }`}
                     whileHover={!isDisabled ? { scale: 1.02 } : {}}
                     whileTap={!isDisabled ? { scale: 0.98 } : {}}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-800">
+                        <h3 className="font-semibold text-foreground">
                           {area.areaLabel}: {area.areaName}
                         </h3>
                       </div>
                       {isSelected && (
-                        <div className="ml-2 bg-primary-600 text-white rounded-full px-2 py-1 text-xs font-medium">
+                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium">
                           1st
                         </div>
                       )}
@@ -93,9 +93,9 @@ export function TopTwoPriorities({
 
           {/* Second Choice */}
           <div>
-            <label className="block text-lg font-semibold text-slate-800 mb-4">
+            <label className="block text-lg font-semibold text-foreground mb-4">
               Second Choice
-              <span className="text-red-500 ml-1">*</span>
+              <span className="text-destructive ml-1">*</span>
             </label>
 
             <div className="grid sm:grid-cols-2 gap-3">
@@ -110,20 +110,20 @@ export function TopTwoPriorities({
                     onClick={() => onSecondChange(podId)}
                     className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                       isSelected
-                        ? 'border-primary-600 bg-primary-50 shadow-md'
-                        : 'border-slate-300 bg-white hover:border-primary-400'
+                        ? 'border-primary bg-primary-soft shadow-md'
+                        : 'border-border bg-card hover:border-primary'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-800">
+                        <h3 className="font-semibold text-foreground">
                           {area.areaLabel}: {area.areaName}
                         </h3>
                       </div>
                       {isSelected && (
-                        <div className="ml-2 bg-primary-500 text-white rounded-full px-2 py-1 text-xs font-medium">
+                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium">
                           2nd
                         </div>
                       )}
@@ -135,8 +135,8 @@ export function TopTwoPriorities({
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-8">
-          <p className="text-sm text-slate-700">
+        <div className="bg-primary-soft border border-primary-border rounded-lg p-4 my-8">
+          <p className="text-sm text-foreground">
             <strong>Note:</strong> Your #1 choice receives a higher priority bonus in the final scoring.
             Choose wisely!
           </p>
@@ -152,7 +152,7 @@ export function TopTwoPriorities({
         </div>
 
         {!isComplete && (
-          <p className="text-sm text-amber-600 text-center mt-4">
+          <p className="text-sm text-warning text-center mt-4">
             Please select both your first and second choices to continue
           </p>
         )}

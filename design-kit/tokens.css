@@ -1,0 +1,145 @@
+:root {
+  --font-sans: "Montserrat", system-ui, -apple-system, sans-serif;
+
+  --type-xs: 12px;
+  --type-sm: 14px;
+  --type-md: 16px;
+  --type-lg: 18px;
+  --type-xl: 20px;
+  --type-2xl: 24px;
+  --type-3xl: 30px;
+  --type-4xl: 36px;
+  --type-5xl: 48px;
+  --type-6xl: 60px;
+
+  --line-tight: 1.1;
+  --line-snug: 1.25;
+  --line-normal: 1.5;
+  --line-relaxed: 1.625;
+  --line-loose: 1.8;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+
+  --space-0: 0px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-96: 96px;
+
+  --radius-base: 8px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 41, 85, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 41, 85, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 41, 85, 0.10);
+
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(211 100% 17%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(211 100% 17%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(211 100% 17%);
+  --color-primary: hsl(207 100% 38%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(214 27% 95%);
+  --color-secondary-foreground: hsl(211 100% 17%);
+  --color-muted: hsl(214 27% 95%);
+  --color-muted-foreground: hsl(211 40% 45%);
+  --color-accent: hsl(211 100% 17%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 72% 51%);
+  --color-border: hsl(214 20% 90%);
+  --color-input: hsl(214 20% 90%);
+  --color-ring: hsl(207 100% 38%);
+
+  --color-chart-1: hsl(207 100% 38%);
+  --color-chart-2: hsl(152 55% 40%);
+  --color-chart-3: hsl(38 90% 50%);
+  --color-chart-4: hsl(280 60% 50%);
+  --color-chart-5: hsl(340 65% 50%);
+
+  --color-sidebar: hsl(0 0% 100%);
+  --color-sidebar-foreground: hsl(211 100% 17%);
+  --color-sidebar-primary: hsl(207 100% 38%);
+  --color-sidebar-primary-foreground: hsl(0 0% 100%);
+  --color-sidebar-accent: hsl(214 27% 95%);
+  --color-sidebar-accent-foreground: hsl(211 100% 17%);
+  --color-sidebar-border: hsl(214 20% 90%);
+  --color-sidebar-ring: hsl(207 100% 38%);
+
+  --color-navy: hsl(211 100% 17%);
+  --color-navy-light: hsl(211 60% 28%);
+  --color-navy-dark: hsl(211 100% 12%);
+  --color-cta: hsl(207 100% 38%);
+  --color-cta-hover: hsl(207 90% 32%);
+  --color-success: hsl(152 55% 40%);
+  --color-warning: hsl(38 90% 50%);
+  --color-gold: hsl(40 65% 50%);
+  --color-gold-light: hsl(40 60% 94%);
+}
+
+.dark {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  --color-background: hsl(215 25% 9%);
+  --color-foreground: hsl(210 15% 92%);
+  --color-card: hsl(215 25% 12%);
+  --color-card-foreground: hsl(210 15% 92%);
+  --color-popover: hsl(215 25% 12%);
+  --color-popover-foreground: hsl(210 15% 92%);
+  --color-primary: hsl(207 80% 55%);
+  --color-primary-foreground: hsl(215 25% 9%);
+  --color-secondary: hsl(215 20% 16%);
+  --color-secondary-foreground: hsl(210 15% 92%);
+  --color-muted: hsl(215 20% 16%);
+  --color-muted-foreground: hsl(215 15% 60%);
+  --color-accent: hsl(207 80% 55%);
+  --color-accent-foreground: hsl(215 25% 9%);
+  --color-destructive: hsl(0 60% 55%);
+  --color-border: hsl(215 20% 18%);
+  --color-input: hsl(215 20% 18%);
+  --color-ring: hsl(207 70% 50%);
+
+  --color-chart-1: hsl(207 80% 55%);
+  --color-chart-2: hsl(152 50% 50%);
+  --color-chart-3: hsl(38 80% 55%);
+  --color-chart-4: hsl(280 55% 60%);
+  --color-chart-5: hsl(340 55% 55%);
+
+  --color-sidebar: hsl(215 25% 10%);
+  --color-sidebar-foreground: hsl(210 15% 92%);
+  --color-sidebar-primary: hsl(207 80% 55%);
+  --color-sidebar-primary-foreground: hsl(215 25% 9%);
+  --color-sidebar-accent: hsl(215 20% 16%);
+  --color-sidebar-accent-foreground: hsl(210 15% 92%);
+  --color-sidebar-border: hsl(215 20% 18%);
+  --color-sidebar-ring: hsl(207 70% 50%);
+
+  --color-navy: hsl(210 60% 55%);
+  --color-navy-light: hsl(210 45% 45%);
+  --color-navy-dark: hsl(210 60% 65%);
+  --color-cta: hsl(207 80% 55%);
+  --color-cta-hover: hsl(207 75% 48%);
+  --color-success: hsl(152 50% 50%);
+  --color-warning: hsl(38 80% 55%);
+}
