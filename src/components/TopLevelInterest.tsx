@@ -46,7 +46,7 @@ export function TopLevelInterest({ state, onUpdate, onNext, onBack }: TopLevelIn
               >
                 <div className="mb-3">
                   <h3 className="text-lg font-semibold text-foreground">
-                    {area.areaLabel} — {area.areaName}
+                    {area.areaName}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     {area.areaDescription}

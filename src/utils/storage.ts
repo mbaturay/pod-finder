@@ -16,18 +16,14 @@ export function loadSubmissions(): SubmissionRecord[] {
   }
 }
 
-export function saveSubmission(record: SubmissionRecord): { success: boolean; error?: string } {
+export function checkPersonKeyExists(personKey: string): boolean {
+  return loadSubmissions().some(s => s.personKey === personKey);
+}
+
+export function saveSubmission(record: SubmissionRecord): void {
   const submissions = loadSubmissions();
-  const existing = submissions.find(s => s.personKey === record.personKey);
-  if (existing) {
-    return {
-      success: false,
-      error: `It looks like you've already completed this survey for ${record.region}. If you need changes, contact an admin.`,
-    };
-  }
   submissions.push(record);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
-  return { success: true };
 }
 
 export function deleteSubmission(id: string): void {

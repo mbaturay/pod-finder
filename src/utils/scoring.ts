@@ -4,9 +4,6 @@ import type {
   PodId,
   AssignmentResult,
   GrowthState,
-  CapacityLevel,
-  LeadershipReadiness,
-  ContributionLevel,
 } from '../types';
 import { PODS, POD_IDS, GROWTH_AREA_MAPPING } from '../config/pods';
 
@@ -172,27 +169,3 @@ export function determineAssignedPod(
   };
 }
 
-export function computeContributionLevel(
-  capacity: CapacityLevel | null,
-  leadership: LeadershipReadiness | null
-): ContributionLevel {
-  if (!capacity || !leadership) return 'Support';
-
-  // Support: either low capacity or not ready for leadership
-  if (capacity === '<1 hr/wk' || leadership === 'Not right now') return 'Support';
-
-  // Lead Candidate: highest capacity + ready now
-  if (capacity === '4+ hrs/wk' && leadership === 'Ready now') return 'Lead Candidate';
-
-  // Core Contributor: high capacity or high leadership readiness
-  if (
-    capacity === '2\u20134 hrs/wk' ||
-    capacity === '4+ hrs/wk' ||
-    leadership === 'Ready now'
-  ) {
-    return 'Core Contributor';
-  }
-
-  // Contributor: everything else (1-2 hrs/wk + Open to it)
-  return 'Contributor';
-}

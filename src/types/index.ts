@@ -30,17 +30,9 @@ export type GrowthFocusArea =
   | 'Innovation & Experimentation'
   | 'Community Building';
 
-export type CapacityLevel = '<1 hr/wk' | '1\u20132 hrs/wk' | '2\u20134 hrs/wk' | '4+ hrs/wk';
-
-export type LeadershipReadiness = 'Not right now' | 'Open to it' | 'Ready now';
-
 export interface GrowthState {
   focusAreas: GrowthFocusArea[];
-  capacity: CapacityLevel | null;
-  leadership: LeadershipReadiness | null;
 }
-
-export type ContributionLevel = 'Support' | 'Contributor' | 'Core Contributor' | 'Lead Candidate';
 
 export interface SurveyState {
   info: InfoState;
@@ -99,7 +91,6 @@ export interface SubmissionRecord {
     secondaryAreaId?: PodId;
     secondaryPodName?: string;
     finalScore: number;
-    contributionLevel: ContributionLevel;
   };
   version: 'v1';
 }
@@ -111,8 +102,6 @@ export type SurveyAction =
   | { type: 'SET_SECOND_CHOICE'; value: PodId | null }
   | { type: 'SET_INFO'; payload: Partial<InfoState> }
   | { type: 'TOGGLE_GROWTH_FOCUS'; area: GrowthFocusArea }
-  | { type: 'SET_CAPACITY'; value: CapacityLevel }
-  | { type: 'SET_LEADERSHIP'; value: LeadershipReadiness }
   | { type: 'NEXT_STEP' }
   | { type: 'PREV_STEP' }
   | { type: 'GO_TO_STEP'; step: number; returnTo?: number }

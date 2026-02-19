@@ -36,13 +36,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   };
 
   const handleExportCSV = () => {
-    const headers = ['Name', 'Region', 'Primary Pod', 'Score', 'Contribution Level', 'Date'];
+    const headers = ['Name', 'Region', 'Primary Pod', 'Score', 'Date'];
     const rows = filtered.map((s) => [
       `${s.firstName} ${s.lastName}`,
       s.region,
       s.computed.winningPodName,
       s.computed.finalScore.toFixed(2),
-      s.computed.contributionLevel,
       new Date(s.createdAt).toLocaleString(),
     ]);
     const csv = [headers, ...rows]
@@ -123,7 +122,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   <th className="text-left px-4 py-3 font-semibold text-foreground">Region</th>
                   <th className="text-left px-4 py-3 font-semibold text-foreground">Primary Pod</th>
                   <th className="text-right px-4 py-3 font-semibold text-foreground">Score</th>
-                  <th className="text-left px-4 py-3 font-semibold text-foreground">Contribution</th>
                   <th className="text-left px-4 py-3 font-semibold text-foreground">Date</th>
                   <th className="text-right px-4 py-3 font-semibold text-foreground">Actions</th>
                 </tr>
@@ -138,11 +136,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     <td className="px-4 py-3 text-foreground">{sub.computed.winningPodName}</td>
                     <td className="px-4 py-3 text-right font-mono text-foreground">
                       {sub.computed.finalScore.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-block bg-primary-soft text-primary text-xs font-medium px-2 py-1 rounded-full">
-                        {sub.computed.contributionLevel}
-                      </span>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {new Date(sub.createdAt).toLocaleDateString()}
@@ -240,7 +233,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                 <div className="space-y-5 text-sm">
                   {/* Info */}
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <span className="text-muted-foreground">Region</span>
                       <p className="font-medium text-foreground">{viewing.region}</p>
@@ -250,10 +243,6 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <p className="font-medium text-foreground">
                         {new Date(viewing.createdAt).toLocaleString()}
                       </p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Contribution</span>
-                      <p className="font-medium text-primary">{viewing.computed.contributionLevel}</p>
                     </div>
                   </div>
 
@@ -298,17 +287,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
                   {/* Growth */}
                   <div>
-                    <h4 className="font-semibold text-foreground mb-2">Growth & Availability</h4>
-                    <div className="flex flex-wrap gap-1 mb-2">
+                    <h4 className="font-semibold text-foreground mb-2">Growth Interests</h4>
+                    <div className="flex flex-wrap gap-1">
                       {viewing.answers.growth.focusAreas.map((a) => (
                         <span key={a} className="bg-primary-soft text-foreground text-xs px-2 py-1 rounded-md">
                           {a}
                         </span>
                       ))}
-                    </div>
-                    <div className="flex gap-4 text-xs text-muted-foreground">
-                      <span>Capacity: <strong className="text-foreground">{viewing.answers.growth.capacity}</strong></span>
-                      <span>Leadership: <strong className="text-foreground">{viewing.answers.growth.leadership}</strong></span>
                     </div>
                   </div>
 

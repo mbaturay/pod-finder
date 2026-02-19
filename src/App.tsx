@@ -6,10 +6,8 @@ import type {
   PodId,
   LikertValue,
   GrowthFocusArea,
-  CapacityLevel,
-  LeadershipReadiness,
 } from './types';
-import { calculateScores, determineAssignedPod, computeContributionLevel } from './utils/scoring';
+import { calculateScores, determineAssignedPod } from './utils/scoring';
 import { normalizePersonKey, saveSubmission } from './utils/storage';
 
 import { ProgressBar } from './components/ProgressBar';
@@ -40,7 +38,7 @@ const initialState: SurveyState = {
   detailedAnswers: { pod1: [], pod2: [], pod3: [], pod4: [] },
   firstChoice: null,
   secondChoice: null,
-  growth: { focusAreas: [], capacity: null, leadership: null },
+  growth: { focusAreas: [] },
   currentStep: 0,
   returnToStep: null,
 };
@@ -84,12 +82,6 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
       return { ...state, growth: { ...state.growth, focusAreas: next } };
     }
 
-    case 'SET_CAPACITY':
-      return { ...state, growth: { ...state.growth, capacity: action.value } };
-
-    case 'SET_LEADERSHIP':
-      return { ...state, growth: { ...state.growth, leadership: action.value } };
-
     case 'NEXT_STEP':
       if (state.returnToStep !== null) {
         return { ...state, currentStep: state.returnToStep, returnToStep: null };
@@ -120,18 +112,9 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
 function App() {
   const [state, dispatch] = useReducer(surveyReducer, initialState);
 
-  const allScores = calculateScores(state);
-  const assignedPod = determineAssignedPod(allScores, state);
-  const contributionLevel = computeContributionLevel(
-    state.growth.capacity,
-    state.growth.leadership
-  );
-
-  const handleSubmit = (): { success: boolean; error?: string } => {
-    // Recompute scores at submit time (source of truth)
+  const handleSubmit = () => {
     const scores = calculateScores(state);
     const assignment = determineAssignedPod(scores, state);
-    const level = computeContributionLevel(state.growth.capacity, state.growth.leadership);
 
     const personKey = normalizePersonKey(
       state.info.firstName,
@@ -162,16 +145,12 @@ function App() {
         secondaryAreaId: assignment.secondary?.podId,
         secondaryPodName: assignment.secondary?.podName,
         finalScore: assignment.primary.finalScore,
-        contributionLevel: level,
       },
       version: 'v1' as const,
     };
 
-    const result = saveSubmission(record);
-    if (result.success) {
-      dispatch({ type: 'NEXT_STEP' });
-    }
-    return result;
+    saveSubmission(record);
+    dispatch({ type: 'NEXT_STEP' });
   };
 
   const handleEdit = (step: number) => {
@@ -248,12 +227,6 @@ function App() {
               onToggleFocus={(area: GrowthFocusArea) =>
                 dispatch({ type: 'TOGGLE_GROWTH_FOCUS', area })
               }
-              onSetCapacity={(value: CapacityLevel) =>
-                dispatch({ type: 'SET_CAPACITY', value })
-              }
-              onSetLeadership={(value: LeadershipReadiness) =>
-                dispatch({ type: 'SET_LEADERSHIP', value })
-              }
               onNext={() => dispatch({ type: 'NEXT_STEP' })}
               onBack={() => dispatch({ type: 'PREV_STEP' })}
             />
@@ -263,8 +236,6 @@ function App() {
             <ReviewStep
               key="review"
               state={state}
-              allScores={allScores}
-              assignedPod={assignedPod}
               onEdit={handleEdit}
               onSubmit={handleSubmit}
               onBack={() => dispatch({ type: 'PREV_STEP' })}
@@ -274,9 +245,6 @@ function App() {
           {state.currentStep === 7 && (
             <ThankYouStep
               key="thanks"
-              assignedPod={assignedPod}
-              allScores={allScores}
-              contributionLevel={contributionLevel}
               onFinish={() => dispatch({ type: 'RESET' })}
             />
           )}

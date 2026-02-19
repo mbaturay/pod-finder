@@ -88,7 +88,7 @@ export function DetailedQuestions({ state, onUpdate, onNext, onBack }: DetailedQ
               >
                 <div className="mb-5">
                   <h3 className="text-xl font-bold text-foreground">
-                    {area.areaLabel}: {area.areaName}
+                    {area.areaName}
                   </h3>
                 </div>
 

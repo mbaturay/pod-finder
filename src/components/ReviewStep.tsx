@@ -1,42 +1,21 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from './Button';
-import type { SurveyState, ScoreBreakdown, AssignmentResult } from '../types';
+import type { SurveyState } from '../types';
 import { PODS, POD_IDS } from '../config/pods';
-import { computeContributionLevel } from '../utils/scoring';
 
 interface ReviewStepProps {
   state: SurveyState;
-  allScores: ScoreBreakdown[];
-  assignedPod: AssignmentResult;
   onEdit: (step: number) => void;
-  onSubmit: () => { success: boolean; error?: string };
+  onSubmit: () => void;
   onBack: () => void;
 }
 
 export function ReviewStep({
   state,
-  allScores,
-  assignedPod,
   onEdit,
   onSubmit,
   onBack,
 }: ReviewStepProps) {
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const sortedScores = [...allScores].sort((a, b) => b.finalScore - a.finalScore);
-  const contributionLevel = computeContributionLevel(
-    state.growth.capacity,
-    state.growth.leadership
-  );
-
-  const handleSubmit = () => {
-    const result = onSubmit();
-    if (!result.success) {
-      setSubmitError(result.error || 'Submission failed.');
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -106,81 +85,26 @@ export function ReviewStep({
             </div>
           </Section>
 
-          {/* Growth */}
-          <Section title="Growth & Availability" onEdit={() => onEdit(5)}>
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-muted-foreground">Focus Areas</span>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {state.growth.focusAreas.map((area) => (
-                    <span
-                      key={area}
-                      className="bg-primary-soft border border-primary-border text-foreground px-2 py-1 rounded-md text-xs font-medium"
-                    >
-                      {area}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-muted-foreground">Capacity</span>
-                  <p className="font-medium text-foreground">{state.growth.capacity ?? '—'}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Leadership</span>
-                  <p className="font-medium text-foreground">{state.growth.leadership ?? '—'}</p>
-                </div>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Contribution Level</span>
-                <p className="font-medium text-primary">{contributionLevel}</p>
-              </div>
+          {/* Growth Interests */}
+          <Section title="Growth Interests" onEdit={() => onEdit(5)}>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {state.growth.focusAreas.map((area) => (
+                <span
+                  key={area}
+                  className="bg-primary-soft border border-primary-border text-foreground px-2 py-1 rounded-md text-xs font-medium"
+                >
+                  {area}
+                </span>
+              ))}
             </div>
           </Section>
-
-          {/* Score Preview */}
-          <div className="bg-primary-soft border border-primary-border rounded-lg p-4">
-            <h3 className="font-semibold text-foreground mb-3">Score Preview</h3>
-            <div className="mb-3">
-              <span className="text-sm text-muted-foreground">Best Match:</span>
-              <span className="ml-2 font-bold text-primary">
-                {assignedPod.primary.areaName}
-              </span>
-              <span className="ml-1 text-sm text-muted-foreground">
-                ({assignedPod.primary.finalScore.toFixed(1)} pts)
-              </span>
-            </div>
-            <div className="space-y-2">
-              {sortedScores.map((score) => {
-                const isWinner = score.podId === assignedPod.primary.podId;
-                return (
-                  <div
-                    key={score.podId}
-                    className={`flex items-center justify-between text-sm rounded px-3 py-1.5 ${
-                      isWinner ? 'bg-cta text-primary-foreground font-medium' : 'text-foreground'
-                    }`}
-                  >
-                    <span>{score.areaName}</span>
-                    <span>{score.finalScore.toFixed(1)}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
-
-        {submitError && (
-          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mt-6">
-            <p className="text-sm text-destructive font-medium">{submitError}</p>
-          </div>
-        )}
 
         <div className="flex justify-between mt-8">
           <Button variant="secondary" onClick={onBack}>
             Back
           </Button>
-          <Button onClick={handleSubmit}>
+          <Button onClick={onSubmit}>
             Submit
           </Button>
         </div>

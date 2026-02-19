@@ -76,7 +76,7 @@ export function TopTwoPriorities({
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">
-                          {area.areaLabel}: {area.areaName}
+                          {area.areaName}
                         </h3>
                       </div>
                       {isSelected && (
@@ -119,7 +119,7 @@ export function TopTwoPriorities({
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">
-                          {area.areaLabel}: {area.areaName}
+                          {area.areaName}
                         </h3>
                       </div>
                       {isSelected && (
