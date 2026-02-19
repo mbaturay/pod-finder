@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
+import { AdminAnalytics } from './components/AdminAnalytics';
 
 export function AdminApp() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -11,12 +12,16 @@ export function AdminApp() {
     return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
   }
 
-  return (
-    <AdminDashboard
-      onLogout={() => {
-        setIsAuthenticated(false);
-        window.location.href = '/';
-      }}
-    />
-  );
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    window.location.href = '/';
+  };
+
+  const isAnalytics = window.location.pathname.startsWith('/admin/analytics');
+
+  if (isAnalytics) {
+    return <AdminAnalytics onLogout={handleLogout} />;
+  }
+
+  return <AdminDashboard onLogout={handleLogout} />;
 }

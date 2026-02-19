@@ -68,6 +68,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="secondary" onClick={() => { window.location.href = '/admin/analytics'; }}>
+              Analytics
+            </Button>
             <Button variant="secondary" onClick={handleExportCSV}>
               Export CSV
             </Button>

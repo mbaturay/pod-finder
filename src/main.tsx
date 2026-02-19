@@ -6,7 +6,7 @@ import App from './App.tsx'
 import { AdminApp } from './AdminApp.tsx'
 
 const pathname = window.location.pathname;
-const isAdmin = pathname === '/admin' || pathname === '/admin/';
+const isAdmin = pathname.startsWith('/admin');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

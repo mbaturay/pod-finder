@@ -41,6 +41,7 @@ const initialState: SurveyState = {
   growth: { focusAreas: [] },
   currentStep: 0,
   returnToStep: null,
+  startedAt: null,
 };
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
@@ -82,11 +83,16 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
       return { ...state, growth: { ...state.growth, focusAreas: next } };
     }
 
-    case 'NEXT_STEP':
+    case 'NEXT_STEP': {
       if (state.returnToStep !== null) {
         return { ...state, currentStep: state.returnToStep, returnToStep: null };
       }
-      return { ...state, currentStep: state.currentStep + 1 };
+      const startedAt =
+        state.currentStep === 0 && !state.startedAt
+          ? new Date().toISOString()
+          : state.startedAt;
+      return { ...state, currentStep: state.currentStep + 1, startedAt };
+    }
 
     case 'PREV_STEP':
       if (state.returnToStep !== null) {
@@ -122,9 +128,14 @@ function App() {
       state.info.region!
     );
 
+    const submittedAt = new Date().toISOString();
+    const durationMinutes = state.startedAt
+      ? (new Date(submittedAt).getTime() - new Date(state.startedAt).getTime()) / 60000
+      : undefined;
+
     const record = {
       id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+      createdAt: submittedAt,
       firstName: state.info.firstName.trim(),
       lastName: state.info.lastName.trim(),
       region: state.info.region!,
@@ -145,6 +156,8 @@ function App() {
         secondaryAreaId: assignment.secondary?.podId,
         secondaryPodName: assignment.secondary?.podName,
         finalScore: assignment.primary.finalScore,
+        submittedAt,
+        durationMinutes,
       },
       version: 'v1' as const,
     };

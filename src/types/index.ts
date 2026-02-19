@@ -43,6 +43,7 @@ export interface SurveyState {
   growth: GrowthState;
   currentStep: number;
   returnToStep: number | null;
+  startedAt: string | null;
 }
 
 export interface ScoreBreakdown {
@@ -91,6 +92,8 @@ export interface SubmissionRecord {
     secondaryAreaId?: PodId;
     secondaryPodName?: string;
     finalScore: number;
+    submittedAt?: string;
+    durationMinutes?: number;
   };
   version: 'v1';
 }
