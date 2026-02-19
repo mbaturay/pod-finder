@@ -1,4 +1,4 @@
-import type { Pod, PodId } from '../types';
+import type { Pod, PodId, GrowthFocusArea } from '../types';
 
 export const PODS: Record<PodId, Pod> = {
   pod1: {
@@ -60,3 +60,26 @@ export const PODS: Record<PodId, Pod> = {
 };
 
 export const POD_IDS: PodId[] = ['pod1', 'pod2', 'pod3', 'pod4'];
+
+export const GROWTH_FOCUS_OPTIONS: GrowthFocusArea[] = [
+  'Technical Depth',
+  'Leadership Skills',
+  'Cross-Functional Exposure',
+  'Client-Facing Skills',
+  'Mentoring & Coaching',
+  'Process Improvement',
+  'Innovation & Experimentation',
+  'Community Building',
+];
+
+/** Maps each growth focus area to the pod areas it supports. */
+export const GROWTH_AREA_MAPPING: Record<GrowthFocusArea, PodId[]> = {
+  'Technical Depth': ['pod1', 'pod4'],
+  'Leadership Skills': ['pod1', 'pod3'],
+  'Cross-Functional Exposure': ['pod2', 'pod4'],
+  'Client-Facing Skills': ['pod2'],
+  'Mentoring & Coaching': ['pod1', 'pod3'],
+  'Process Improvement': ['pod4'],
+  'Innovation & Experimentation': ['pod1', 'pod4'],
+  'Community Building': ['pod3'],
+};

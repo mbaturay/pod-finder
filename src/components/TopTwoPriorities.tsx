@@ -147,7 +147,7 @@ export function TopTwoPriorities({
             Back
           </Button>
           <Button onClick={onNext} disabled={!isComplete}>
-            See Results
+            Continue
           </Button>
         </div>
 

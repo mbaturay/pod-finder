@@ -1,55 +1,68 @@
 import { useReducer } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import type { SurveyState, SurveyAction, PodId, LikertValue } from './types';
-import { calculateScores, determineAssignedPod } from './utils/scoring';
+import type {
+  SurveyState,
+  SurveyAction,
+  PodId,
+  LikertValue,
+  GrowthFocusArea,
+  CapacityLevel,
+  LeadershipReadiness,
+} from './types';
+import { calculateScores, determineAssignedPod, computeContributionLevel } from './utils/scoring';
+import { normalizePersonKey, saveSubmission } from './utils/storage';
 
 import { ProgressBar } from './components/ProgressBar';
 import { IntroScreen } from './components/IntroScreen';
+import { InfoStep } from './components/InfoStep';
 import { TopLevelInterest } from './components/TopLevelInterest';
 import { DetailedQuestions } from './components/DetailedQuestions';
 import { TopTwoPriorities } from './components/TopTwoPriorities';
-import { Results } from './components/Results';
+import { GrowthStep } from './components/GrowthStep';
+import { ReviewStep } from './components/ReviewStep';
+import { ThankYouStep } from './components/ThankYouStep';
+
+/*
+ * Wizard steps:
+ * 0 = Intro
+ * 1 = Info (name + region)
+ * 2 = Interest
+ * 3 = Details (conditional)
+ * 4 = Priorities
+ * 5 = Growth
+ * 6 = Review
+ * 7 = Thank You
+ */
 
 const initialState: SurveyState = {
-  topLevelInterest: {
-    pod1: null,
-    pod2: null,
-    pod3: null,
-    pod4: null,
-  },
-  detailedAnswers: {
-    pod1: [],
-    pod2: [],
-    pod3: [],
-    pod4: [],
-  },
+  info: { firstName: '', lastName: '', region: null },
+  topLevelInterest: { pod1: null, pod2: null, pod3: null, pod4: null },
+  detailedAnswers: { pod1: [], pod2: [], pod3: [], pod4: [] },
   firstChoice: null,
   secondChoice: null,
+  growth: { focusAreas: [], capacity: null, leadership: null },
   currentStep: 0,
+  returnToStep: null,
 };
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
   switch (action.type) {
+    case 'SET_INFO':
+      return { ...state, info: { ...state.info, ...action.payload } };
+
     case 'SET_TOP_LEVEL_INTEREST':
       return {
         ...state,
-        topLevelInterest: {
-          ...state.topLevelInterest,
-          [action.podId]: action.value,
-        },
+        topLevelInterest: { ...state.topLevelInterest, [action.podId]: action.value },
       };
 
     case 'SET_DETAILED_ANSWER': {
       const currentAnswers = state.detailedAnswers[action.podId] || [];
       const newAnswers = [...currentAnswers];
       newAnswers[action.questionIndex] = action.value;
-
       return {
         ...state,
-        detailedAnswers: {
-          ...state.detailedAnswers,
-          [action.podId]: newAnswers,
-        },
+        detailedAnswers: { ...state.detailedAnswers, [action.podId]: newAnswers },
       };
     }
 
@@ -57,26 +70,43 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
       return {
         ...state,
         firstChoice: action.value,
-        // Clear second choice if it's the same as new first choice
         secondChoice: state.secondChoice === action.value ? null : state.secondChoice,
       };
 
     case 'SET_SECOND_CHOICE':
-      return {
-        ...state,
-        secondChoice: action.value,
-      };
+      return { ...state, secondChoice: action.value };
+
+    case 'TOGGLE_GROWTH_FOCUS': {
+      const current = state.growth.focusAreas;
+      const next = current.includes(action.area)
+        ? current.filter((a) => a !== action.area)
+        : [...current, action.area];
+      return { ...state, growth: { ...state.growth, focusAreas: next } };
+    }
+
+    case 'SET_CAPACITY':
+      return { ...state, growth: { ...state.growth, capacity: action.value } };
+
+    case 'SET_LEADERSHIP':
+      return { ...state, growth: { ...state.growth, leadership: action.value } };
 
     case 'NEXT_STEP':
-      return {
-        ...state,
-        currentStep: state.currentStep + 1,
-      };
+      if (state.returnToStep !== null) {
+        return { ...state, currentStep: state.returnToStep, returnToStep: null };
+      }
+      return { ...state, currentStep: state.currentStep + 1 };
 
     case 'PREV_STEP':
+      if (state.returnToStep !== null) {
+        return { ...state, currentStep: state.returnToStep, returnToStep: null };
+      }
+      return { ...state, currentStep: Math.max(0, state.currentStep - 1) };
+
+    case 'GO_TO_STEP':
       return {
         ...state,
-        currentStep: Math.max(0, state.currentStep - 1),
+        currentStep: action.step,
+        returnToStep: action.returnTo ?? null,
       };
 
     case 'RESET':
@@ -90,91 +120,164 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
 function App() {
   const [state, dispatch] = useReducer(surveyReducer, initialState);
 
-  const handleTopLevelInterest = (podId: PodId, value: LikertValue) => {
-    dispatch({ type: 'SET_TOP_LEVEL_INTEREST', podId, value });
-  };
-
-  const handleDetailedAnswer = (podId: PodId, questionIndex: number, value: LikertValue) => {
-    dispatch({ type: 'SET_DETAILED_ANSWER', podId, questionIndex, value });
-  };
-
-  const handleFirstChoice = (value: PodId | null) => {
-    dispatch({ type: 'SET_FIRST_CHOICE', value });
-  };
-
-  const handleSecondChoice = (value: PodId | null) => {
-    dispatch({ type: 'SET_SECOND_CHOICE', value });
-  };
-
-  const handleNext = () => {
-    dispatch({ type: 'NEXT_STEP' });
-  };
-
-  const handleBack = () => {
-    dispatch({ type: 'PREV_STEP' });
-  };
-
-  const handleReset = () => {
-    dispatch({ type: 'RESET' });
-  };
-
-  // Calculate results for the results screen
   const allScores = calculateScores(state);
   const assignedPod = determineAssignedPod(allScores, state);
+  const contributionLevel = computeContributionLevel(
+    state.growth.capacity,
+    state.growth.leadership
+  );
+
+  const handleSubmit = (): { success: boolean; error?: string } => {
+    // Recompute scores at submit time (source of truth)
+    const scores = calculateScores(state);
+    const assignment = determineAssignedPod(scores, state);
+    const level = computeContributionLevel(state.growth.capacity, state.growth.leadership);
+
+    const personKey = normalizePersonKey(
+      state.info.firstName,
+      state.info.lastName,
+      state.info.region!
+    );
+
+    const record = {
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+      firstName: state.info.firstName.trim(),
+      lastName: state.info.lastName.trim(),
+      region: state.info.region!,
+      personKey,
+      answers: {
+        topLevelInterest: state.topLevelInterest,
+        detailedAnswers: state.detailedAnswers,
+        firstChoice: state.firstChoice,
+        secondChoice: state.secondChoice,
+        growth: state.growth,
+      },
+      computed: {
+        areaScores: scores,
+        winningAreaId: assignment.primary.podId,
+        winningAreaName: assignment.primary.areaName,
+        winningPodName: assignment.primary.podName,
+        isMultiFit: assignment.isMultiFit,
+        secondaryAreaId: assignment.secondary?.podId,
+        secondaryPodName: assignment.secondary?.podName,
+        finalScore: assignment.primary.finalScore,
+        contributionLevel: level,
+      },
+      version: 'v1' as const,
+    };
+
+    const result = saveSubmission(record);
+    if (result.success) {
+      dispatch({ type: 'NEXT_STEP' });
+    }
+    return result;
+  };
+
+  const handleEdit = (step: number) => {
+    dispatch({ type: 'GO_TO_STEP', step, returnTo: 6 });
+  };
 
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Progress bar - hide on intro and results */}
-        {state.currentStep > 0 && state.currentStep < 4 && (
-          <ProgressBar currentStep={state.currentStep} totalSteps={4} />
+        {/* Progress bar: visible for steps 1-6 */}
+        {state.currentStep >= 1 && state.currentStep <= 6 && (
+          <ProgressBar currentStep={state.currentStep} totalSteps={7} />
         )}
 
-        {/* Survey Steps */}
         <AnimatePresence mode="wait">
           {state.currentStep === 0 && (
-            <IntroScreen key="intro" onStart={handleNext} />
+            <IntroScreen key="intro" onStart={() => dispatch({ type: 'NEXT_STEP' })} />
           )}
 
           {state.currentStep === 1 && (
-            <TopLevelInterest
-              key="top-level"
-              state={state}
-              onUpdate={handleTopLevelInterest}
-              onNext={handleNext}
-              onBack={handleBack}
+            <InfoStep
+              key="info"
+              info={state.info}
+              onUpdate={(payload) => dispatch({ type: 'SET_INFO', payload })}
+              onNext={() => dispatch({ type: 'NEXT_STEP' })}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
             />
           )}
 
           {state.currentStep === 2 && (
-            <DetailedQuestions
-              key="detailed"
+            <TopLevelInterest
+              key="top-level"
               state={state}
-              onUpdate={handleDetailedAnswer}
-              onNext={handleNext}
-              onBack={handleBack}
+              onUpdate={(podId: PodId, value: LikertValue) =>
+                dispatch({ type: 'SET_TOP_LEVEL_INTEREST', podId, value })
+              }
+              onNext={() => dispatch({ type: 'NEXT_STEP' })}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
             />
           )}
 
           {state.currentStep === 3 && (
-            <TopTwoPriorities
-              key="priorities"
-              firstChoice={state.firstChoice}
-              secondChoice={state.secondChoice}
-              onFirstChange={handleFirstChoice}
-              onSecondChange={handleSecondChoice}
-              onNext={handleNext}
-              onBack={handleBack}
+            <DetailedQuestions
+              key="detailed"
+              state={state}
+              onUpdate={(podId: PodId, questionIndex: number, value: LikertValue) =>
+                dispatch({ type: 'SET_DETAILED_ANSWER', podId, questionIndex, value })
+              }
+              onNext={() => dispatch({ type: 'NEXT_STEP' })}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
             />
           )}
 
           {state.currentStep === 4 && (
-            <Results
-              key="results"
+            <TopTwoPriorities
+              key="priorities"
+              firstChoice={state.firstChoice}
+              secondChoice={state.secondChoice}
+              onFirstChange={(value: PodId | null) =>
+                dispatch({ type: 'SET_FIRST_CHOICE', value })
+              }
+              onSecondChange={(value: PodId | null) =>
+                dispatch({ type: 'SET_SECOND_CHOICE', value })
+              }
+              onNext={() => dispatch({ type: 'NEXT_STEP' })}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
+            />
+          )}
+
+          {state.currentStep === 5 && (
+            <GrowthStep
+              key="growth"
+              growth={state.growth}
+              onToggleFocus={(area: GrowthFocusArea) =>
+                dispatch({ type: 'TOGGLE_GROWTH_FOCUS', area })
+              }
+              onSetCapacity={(value: CapacityLevel) =>
+                dispatch({ type: 'SET_CAPACITY', value })
+              }
+              onSetLeadership={(value: LeadershipReadiness) =>
+                dispatch({ type: 'SET_LEADERSHIP', value })
+              }
+              onNext={() => dispatch({ type: 'NEXT_STEP' })}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
+            />
+          )}
+
+          {state.currentStep === 6 && (
+            <ReviewStep
+              key="review"
+              state={state}
+              allScores={allScores}
+              assignedPod={assignedPod}
+              onEdit={handleEdit}
+              onSubmit={handleSubmit}
+              onBack={() => dispatch({ type: 'PREV_STEP' })}
+            />
+          )}
+
+          {state.currentStep === 7 && (
+            <ThankYouStep
+              key="thanks"
               assignedPod={assignedPod}
               allScores={allScores}
-              state={state}
-              onReset={handleReset}
+              contributionLevel={contributionLevel}
+              onFinish={() => dispatch({ type: 'RESET' })}
             />
           )}
         </AnimatePresence>

@@ -5,16 +5,19 @@ interface ProgressBarProps {
   totalSteps: number;
 }
 
+const STEP_LABELS = [
+  'Intro',
+  'Info',
+  'Interest',
+  'Details',
+  'Priorities',
+  'Growth',
+  'Review',
+  'Done',
+];
+
 export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
   const percentage = (currentStep / totalSteps) * 100;
-
-  const steps = [
-    'Intro',
-    'Interest',
-    'Details',
-    'Priorities',
-    'Results',
-  ];
 
   return (
     <div className="mb-8">
@@ -30,7 +33,7 @@ export function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
 
       {/* Step indicators */}
       <div className="flex justify-between items-center">
-        {steps.map((step, index) => {
+        {STEP_LABELS.map((step, index) => {
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
 

@@ -38,19 +38,19 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
           <div className="grid sm:grid-cols-2 gap-4">
             {[
               {
-                title: 'Area 1: Grow Our Craft',
+                title: 'Grow Our Craft',
                 description: 'Teaching, coaching, and building internal capability',
               },
               {
-                title: 'Area 2: Shape the Story',
+                title: 'Shape the Story',
                 description: 'Research, narratives, and client-facing materials',
               },
               {
-                title: 'Area 3: Strengthen Our Team',
+                title: 'Strengthen Our Team',
                 description: 'Community building and team connection',
               },
               {
-                title: 'Area 4: Scale Delivery Excellence',
+                title: 'Scale Delivery Excellence',
                 description: 'Templates, standards, and process improvements',
               },
             ].map((area) => (
@@ -67,10 +67,12 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
           <div className="bg-primary-soft border border-primary-border rounded-lg p-4">
             <h3 className="font-semibold text-foreground mb-2">How it works:</h3>
             <ol className="list-decimal list-inside space-y-2 text-foreground">
+              <li>Enter your name and region</li>
               <li>Rate your interest in each area (1-5 scale)</li>
               <li>Answer detailed questions for areas that interest you</li>
               <li>Choose your top 2 area preferences</li>
-              <li>Get your personalized recommendation</li>
+              <li>Share your growth goals and availability</li>
+              <li>Review and submit your response</li>
             </ol>
           </div>
 
@@ -91,7 +93,7 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
           <Button onClick={onStart} className="px-8 py-3 text-lg">
             Get Started
           </Button>
-          <p className="text-xs text-muted-foreground mt-3">Takes about 5 minutes</p>
+          <p className="text-xs text-muted-foreground mt-3">Takes about 7 minutes</p>
         </div>
       </div>
     </motion.div>

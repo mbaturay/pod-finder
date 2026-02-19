@@ -2,29 +2,55 @@ export type PodId = 'pod1' | 'pod2' | 'pod3' | 'pod4';
 
 export interface Pod {
   id: PodId;
-  areaLabel: string; // Neutral label (Area A, B, C, D)
-  areaName: string; // Neutral description
-  areaDescription: string; // Short one-sentence description
-  podName: string; // Real POD name (revealed at results)
-  podDescription: string; // Real POD description
+  areaLabel: string;
+  areaName: string;
+  areaDescription: string;
+  podName: string;
+  podDescription: string;
   detailedQuestions: string[];
 }
 
 export type LikertValue = 1 | 2 | 3 | 4 | 5 | null;
 
+export type Region = 'East' | 'Central' | 'West';
+
+export interface InfoState {
+  firstName: string;
+  lastName: string;
+  region: Region | null;
+}
+
+export type GrowthFocusArea =
+  | 'Technical Depth'
+  | 'Leadership Skills'
+  | 'Cross-Functional Exposure'
+  | 'Client-Facing Skills'
+  | 'Mentoring & Coaching'
+  | 'Process Improvement'
+  | 'Innovation & Experimentation'
+  | 'Community Building';
+
+export type CapacityLevel = '<1 hr/wk' | '1\u20132 hrs/wk' | '2\u20134 hrs/wk' | '4+ hrs/wk';
+
+export type LeadershipReadiness = 'Not right now' | 'Open to it' | 'Ready now';
+
+export interface GrowthState {
+  focusAreas: GrowthFocusArea[];
+  capacity: CapacityLevel | null;
+  leadership: LeadershipReadiness | null;
+}
+
+export type ContributionLevel = 'Support' | 'Contributor' | 'Core Contributor' | 'Lead Candidate';
+
 export interface SurveyState {
-  // Section A: Top-level interest
+  info: InfoState;
   topLevelInterest: Record<PodId, LikertValue>;
-
-  // Section B: Detailed questions (only for areas with interest >= 3)
   detailedAnswers: Record<PodId, LikertValue[]>;
-
-  // Section C: Top 2 priorities
   firstChoice: PodId | null;
   secondChoice: PodId | null;
-
-  // UI state
+  growth: GrowthState;
   currentStep: number;
+  returnToStep: number | null;
 }
 
 export interface ScoreBreakdown {
@@ -37,6 +63,8 @@ export interface ScoreBreakdown {
   detailedAnswers: number[];
   detailScore: number;
   priorityBonus: number;
+  growthBonus: number;
+  coreScore: number;
   finalScore: number;
   topDrivers: Array<{ question: string; rating: number }>;
 }
@@ -48,11 +76,44 @@ export interface AssignmentResult {
   tiedAreas?: ScoreBreakdown[];
 }
 
+export interface SubmissionRecord {
+  id: string;
+  createdAt: string;
+  firstName: string;
+  lastName: string;
+  region: Region;
+  personKey: string;
+  answers: {
+    topLevelInterest: Record<PodId, LikertValue>;
+    detailedAnswers: Record<PodId, LikertValue[]>;
+    firstChoice: PodId | null;
+    secondChoice: PodId | null;
+    growth: GrowthState;
+  };
+  computed: {
+    areaScores: ScoreBreakdown[];
+    winningAreaId: PodId;
+    winningAreaName: string;
+    winningPodName: string;
+    isMultiFit: boolean;
+    secondaryAreaId?: PodId;
+    secondaryPodName?: string;
+    finalScore: number;
+    contributionLevel: ContributionLevel;
+  };
+  version: 'v1';
+}
+
 export type SurveyAction =
   | { type: 'SET_TOP_LEVEL_INTEREST'; podId: PodId; value: LikertValue }
   | { type: 'SET_DETAILED_ANSWER'; podId: PodId; questionIndex: number; value: LikertValue }
   | { type: 'SET_FIRST_CHOICE'; value: PodId | null }
   | { type: 'SET_SECOND_CHOICE'; value: PodId | null }
+  | { type: 'SET_INFO'; payload: Partial<InfoState> }
+  | { type: 'TOGGLE_GROWTH_FOCUS'; area: GrowthFocusArea }
+  | { type: 'SET_CAPACITY'; value: CapacityLevel }
+  | { type: 'SET_LEADERSHIP'; value: LeadershipReadiness }
   | { type: 'NEXT_STEP' }
   | { type: 'PREV_STEP' }
+  | { type: 'GO_TO_STEP'; step: number; returnTo?: number }
   | { type: 'RESET' };

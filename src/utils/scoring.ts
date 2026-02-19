@@ -1,5 +1,16 @@
-import type { SurveyState, ScoreBreakdown, PodId, AssignmentResult } from '../types';
-import { PODS, POD_IDS } from '../config/pods';
+import type {
+  SurveyState,
+  ScoreBreakdown,
+  PodId,
+  AssignmentResult,
+  GrowthState,
+  CapacityLevel,
+  LeadershipReadiness,
+  ContributionLevel,
+} from '../types';
+import { PODS, POD_IDS, GROWTH_AREA_MAPPING } from '../config/pods';
+
+const EPSILON = 1e-9;
 
 function getScaledPriorityBonus(
   podId: PodId,
@@ -37,6 +48,17 @@ function getTopDrivers(
   return drivers;
 }
 
+function calculateGrowthBonus(podId: PodId, growth: GrowthState): number {
+  if (growth.focusAreas.length === 0) return 0;
+
+  const hits = growth.focusAreas.filter(area =>
+    GROWTH_AREA_MAPPING[area]?.includes(podId)
+  ).length;
+
+  const growthMatch = hits / Math.max(1, growth.focusAreas.length);
+  return growthMatch * 0.25;
+}
+
 export function calculateScores(state: SurveyState): ScoreBreakdown[] {
   return POD_IDS.map((podId) => {
     const pod = PODS[podId];
@@ -49,8 +71,9 @@ export function calculateScores(state: SurveyState): ScoreBreakdown[] {
 
     const detailScore = calculateDetailScore(detailedAnswers);
     const priorityBonus = getScaledPriorityBonus(podId, topLevelInterest, state);
-
-    const finalScore = baseScore + detailScore + priorityBonus;
+    const coreScore = baseScore + detailScore + priorityBonus;
+    const growthBonus = calculateGrowthBonus(podId, state.growth);
+    const finalScore = coreScore + growthBonus;
 
     const topDrivers = getTopDrivers(detailedAnswers, pod.detailedQuestions);
 
@@ -64,6 +87,8 @@ export function calculateScores(state: SurveyState): ScoreBreakdown[] {
       detailedAnswers,
       detailScore,
       priorityBonus,
+      growthBonus,
+      coreScore,
       finalScore,
       topDrivers,
     };
@@ -75,23 +100,16 @@ export function calculateScores(state: SurveyState): ScoreBreakdown[] {
  *
  * CRITICAL: Preferences (First/Second Choice) are ONLY used as tie-breakers
  * among areas with the HIGHEST FinalScore. They NEVER override higher scores.
- *
- * Example scenario:
- * - Area 3 FinalScore = 4.0, Area 4 FinalScore = 4.0
- * - Area 1 FinalScore = 3.2 (First Choice), Area 2 FinalScore = 2.8
- * - Winner MUST be Area 3 or 4 (tied at max score), NOT Area 1
  */
 export function determineAssignedPod(
   breakdowns: ScoreBreakdown[],
   state: SurveyState
 ): AssignmentResult {
-  // Find the maximum FinalScore
   const maxScore = Math.max(...breakdowns.map((b) => b.finalScore));
 
-  // Find all areas with the maximum FinalScore (exact equality)
-  const topTies = breakdowns.filter((b) => b.finalScore === maxScore);
+  // Find all areas with the maximum FinalScore (epsilon equality for floats)
+  const topTies = breakdowns.filter((b) => Math.abs(b.finalScore - maxScore) < EPSILON);
 
-  // If only one area has the max score, it's the clear winner
   if (topTies.length === 1) {
     return {
       primary: topTies[0],
@@ -142,8 +160,6 @@ export function determineAssignedPod(
   }
 
   // True tie after all tie-breakers - Multi-fit state
-  // Select Primary and Secondary from the tied max-score areas (detailTies)
-  // Use deterministic ordering (pod1 -> pod2 -> pod3 -> pod4)
   const multiFitAreas = [...detailTies].sort((a, b) =>
     a.podId.localeCompare(b.podId)
   );
@@ -154,4 +170,29 @@ export function determineAssignedPod(
     secondary: multiFitAreas[1],
     tiedAreas: multiFitAreas,
   };
+}
+
+export function computeContributionLevel(
+  capacity: CapacityLevel | null,
+  leadership: LeadershipReadiness | null
+): ContributionLevel {
+  if (!capacity || !leadership) return 'Support';
+
+  // Support: either low capacity or not ready for leadership
+  if (capacity === '<1 hr/wk' || leadership === 'Not right now') return 'Support';
+
+  // Lead Candidate: highest capacity + ready now
+  if (capacity === '4+ hrs/wk' && leadership === 'Ready now') return 'Lead Candidate';
+
+  // Core Contributor: high capacity or high leadership readiness
+  if (
+    capacity === '2\u20134 hrs/wk' ||
+    capacity === '4+ hrs/wk' ||
+    leadership === 'Ready now'
+  ) {
+    return 'Core Contributor';
+  }
+
+  // Contributor: everything else (1-2 hrs/wk + Open to it)
+  return 'Contributor';
 }
