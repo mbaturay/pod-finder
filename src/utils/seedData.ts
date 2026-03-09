@@ -209,8 +209,8 @@ function computeScores(
     const topLevel = state.topLevelInterest[podId] || 0;
     const baseScore = topLevel * 2;
 
-    const detailed: number[] = (state.detailedAnswers[podId] || [])
-      .filter((v): v is number => v !== null);
+    const detailed = (state.detailedAnswers[podId] || [])
+      .filter((v): v is NonNullable<LikertValue> => v !== null);
 
     let detailScore = 0;
     if (detailed.length > 0) {

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './Button';
-import type { SubmissionRecord, Region, PodId } from '../types';
+import type { SubmissionRecord, Region } from '../types';
 import { loadSubmissions, deleteSubmission } from '../utils/storage';
 import { loadSeedData, clearAllSubmissions } from '../utils/seedData';
 import { PODS, POD_IDS } from '../config/pods';
