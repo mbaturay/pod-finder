@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './Button';
 import type { SubmissionRecord, Region, PodId } from '../types';
 import { loadSubmissions, deleteSubmission } from '../utils/storage';
+import { loadSeedData, clearAllSubmissions } from '../utils/seedData';
 import { PODS, POD_IDS } from '../config/pods';
 
 interface AdminDashboardProps {
@@ -68,6 +69,30 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {submissions.length === 0 && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  const count = loadSeedData();
+                  if (count > 0) setSubmissions(loadSubmissions());
+                }}
+              >
+                Load Demo Data
+              </Button>
+            )}
+            {submissions.length > 0 && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (confirm('Clear all submissions? This cannot be undone.')) {
+                    clearAllSubmissions();
+                    setSubmissions([]);
+                  }
+                }}
+              >
+                Clear All
+              </Button>
+            )}
             <Button variant="secondary" onClick={() => { window.location.href = '/admin/analytics'; }}>
               Analytics
             </Button>
