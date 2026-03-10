@@ -18,8 +18,8 @@ export const PODS: Record<PodId, Pod> = {
   pod2: {
     id: 'pod2',
     areaLabel: 'Area 2',
-    areaName: 'Shape the Story',
-    areaDescription: 'Research, POVs, pitch materials, and future-state storytelling for clients.',
+    areaName: 'Shape Our Client Stories',
+    areaDescription: 'Research, narratives, and client-facing materials for pursuits and go-to-market sales support',
     podName: 'Pursuit / Sales GTM Support',
     podDescription: 'Support sales and business development with thought leadership and pursuit materials',
     detailedQuestions: [
@@ -33,7 +33,7 @@ export const PODS: Record<PodId, Pod> = {
     id: 'pod3',
     areaLabel: 'Area 3',
     areaName: 'Strengthen Our Team',
-    areaDescription: 'Community building, mentorship, psychological safety, and team experiences.',
+    areaDescription: 'Community building and team connection',
     podName: 'Culture & Community of Practice',
     podDescription: 'Foster team culture, community, and create opportunities for connection',
     detailedQuestions: [
@@ -47,7 +47,7 @@ export const PODS: Record<PodId, Pod> = {
     id: 'pod4',
     areaLabel: 'Area 4',
     areaName: 'Scale Delivery Excellence',
-    areaDescription: 'Templates, standards, toolkits, and improving how we deliver work.',
+    areaDescription: 'Templates, standards, and process improvements',
     podName: 'Delivery Support & Enablement',
     podDescription: 'Create tools, templates, and standards to improve delivery excellence',
     detailedQuestions: [

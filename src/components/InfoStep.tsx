@@ -11,7 +11,7 @@ interface InfoStepProps {
   onBack: () => void;
 }
 
-const REGIONS: Region[] = ['East', 'Central', 'West'];
+const REGIONS: Region[] = ['West', 'Central', 'East'];
 
 export function InfoStep({ info, onUpdate, onNext, onBack }: InfoStepProps) {
   const [duplicateError, setDuplicateError] = useState(false);

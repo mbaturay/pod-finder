@@ -42,8 +42,8 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
                 description: 'Teaching, coaching, and building internal capability',
               },
               {
-                title: 'Shape the Story',
-                description: 'Research, narratives, and client-facing materials',
+                title: 'Shape Our Client Stories',
+                description: 'Research, narratives, and client-facing materials for pursuits and go-to-market sales support',
               },
               {
                 title: 'Strengthen Our Team',
