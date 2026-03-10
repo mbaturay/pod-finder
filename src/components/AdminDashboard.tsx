@@ -198,7 +198,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/30 flex items-center justify-center z-50 px-4"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 px-4"
               onClick={() => setDeletingId(null)}
             >
               <motion.div
@@ -236,14 +236,14 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-foreground/30 flex items-start justify-center z-50 px-4 py-8 overflow-y-auto"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 px-4 overflow-y-auto"
               onClick={() => setViewingId(null)}
             >
               <motion.div
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="card max-w-2xl w-full"
+                className="card max-w-2xl w-full max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6">
