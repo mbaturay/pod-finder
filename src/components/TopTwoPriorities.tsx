@@ -22,9 +22,6 @@ export function TopTwoPriorities({
 }: TopTwoPrioritiesProps) {
   const isComplete = firstChoice !== null && secondChoice !== null;
 
-  // Available options for second choice (exclude first choice)
-  const secondChoiceOptions = POD_IDS.filter((podId) => podId !== firstChoice);
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -78,9 +75,12 @@ export function TopTwoPriorities({
                         <h3 className="font-semibold text-foreground">
                           {area.areaName}
                         </h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {area.areaDescription}
+                        </p>
                       </div>
                       {isSelected && (
-                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium">
+                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium shrink-0">
                           1st
                         </div>
                       )}
@@ -99,31 +99,38 @@ export function TopTwoPriorities({
             </label>
 
             <div className="grid sm:grid-cols-2 gap-3">
-              {secondChoiceOptions.map((podId) => {
+              {POD_IDS.map((podId) => {
                 const area = PODS[podId];
                 const isSelected = secondChoice === podId;
+                const isDisabled = firstChoice === podId;
 
                 return (
                   <motion.button
                     key={podId}
                     type="button"
                     onClick={() => onSecondChange(podId)}
+                    disabled={isDisabled}
                     className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                       isSelected
                         ? 'border-primary bg-primary-soft shadow-md'
+                        : isDisabled
+                        ? 'border-border bg-muted opacity-50 cursor-not-allowed'
                         : 'border-border bg-card hover:border-primary'
                     }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={!isDisabled ? { scale: 1.02 } : {}}
+                    whileTap={!isDisabled ? { scale: 0.98 } : {}}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-foreground">
                           {area.areaName}
                         </h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {area.areaDescription}
+                        </p>
                       </div>
                       {isSelected && (
-                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium">
+                        <div className="ml-2 bg-cta text-primary-foreground rounded-full px-2 py-1 text-xs font-medium shrink-0">
                           2nd
                         </div>
                       )}
@@ -137,8 +144,8 @@ export function TopTwoPriorities({
 
         <div className="bg-primary-soft border border-primary-border rounded-lg p-4 my-8">
           <p className="text-sm text-foreground">
-            <strong>Note:</strong> Your #1 choice receives a higher priority bonus in the final scoring.
-            Choose wisely!
+            <strong>Note:</strong> Your #1 choice receives a higher priority in your final scoring.
+            Choose the area you are most enthusiastic about.
           </p>
         </div>
 

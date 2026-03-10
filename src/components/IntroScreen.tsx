@@ -17,23 +17,17 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
       <div className="card">
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
-            POD Finder
+            Crafting our Product Design practice, together
           </h1>
           <p className="text-lg text-muted-foreground">
-            Discover which area of contribution best matches your interests
+            It takes a village. We need your help to succeed
           </p>
         </div>
 
         <div className="space-y-6 mb-8">
-          <div>
-            <h2 className="text-xl font-semibold text-foreground mb-3">
-              About This Survey
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              This survey helps you identify where you can make the most meaningful contribution.
-              You'll rate your interest in different types of activities across four areas:
-            </p>
-          </div>
+          <p className="text-muted-foreground leading-relaxed">
+            Your input will help us connect your interests with meaningful ways to operate and grow Product Design. This opens the door for you to actively participate in our community of practice and showcase your work to the wider team. We ask that you honestly rate your interest across 4 essential areas. Don't worry if it's an area you need experience in.
+          </p>
 
           <div className="grid sm:grid-cols-2 gap-4">
             {[
@@ -78,13 +72,13 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
 
           <div className="bg-muted border border-border rounded-lg p-4">
             <h3 className="font-semibold text-foreground mb-2">Rating Scale:</h3>
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-left gap-3 text-sm">
               <span className="text-muted-foreground">1 = Not at all like me</span>
               <span className="text-muted-foreground">&rarr;</span>
               <span className="text-muted-foreground">5 = Very much like me</span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              If you rate an area 1 or 2, you'll skip its detailed questions.
+              * If you rate an area 1 or 2, you'll skip its detailed questions.
             </p>
           </div>
         </div>

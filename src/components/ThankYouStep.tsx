@@ -37,7 +37,7 @@ export function ThankYouStep({ onFinish }: ThankYouStepProps) {
             Your responses have been recorded.
           </p>
           <p className="text-sm text-muted-foreground mb-8">
-            Leadership will review assignments and follow up as needed.
+            We will review your input and follow up as needed. Let's grow our community of practice together!
           </p>
 
           <Button onClick={onFinish} className="px-8 py-3">
