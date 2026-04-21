@@ -34,6 +34,8 @@ export interface GrowthState {
   focusAreas: GrowthFocusArea[];
 }
 
+export type SubmitErrorKind = 'duplicate' | 'error';
+
 export interface SurveyState {
   info: InfoState;
   topLevelInterest: Record<PodId, LikertValue>;
@@ -44,6 +46,7 @@ export interface SurveyState {
   currentStep: number;
   returnToStep: number | null;
   startedAt: string | null;
+  submitError: SubmitErrorKind | null;
 }
 
 export interface ScoreBreakdown {
@@ -108,4 +111,5 @@ export type SurveyAction =
   | { type: 'NEXT_STEP' }
   | { type: 'PREV_STEP' }
   | { type: 'GO_TO_STEP'; step: number; returnTo?: number }
+  | { type: 'SET_SUBMIT_ERROR'; error: SubmitErrorKind | null }
   | { type: 'RESET' };

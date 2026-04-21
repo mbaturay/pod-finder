@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './Button';
 import type { SubmissionRecord, Region } from '../types';
@@ -11,11 +11,29 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [submissions, setSubmissions] = useState<SubmissionRecord[]>(loadSubmissions);
+  const [submissions, setSubmissions] = useState<SubmissionRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [search, setSearch] = useState('');
   const [regionFilter, setRegionFilter] = useState<Region | ''>('');
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    setLoadError(false);
+    try {
+      const rows = await loadSubmissions();
+      setSubmissions(rows);
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   const filtered = useMemo(() => {
     return submissions.filter((s) => {
@@ -29,9 +47,13 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const viewing = viewingId ? submissions.find((s) => s.id === viewingId) : null;
 
-  const handleDelete = (id: string) => {
-    deleteSubmission(id);
-    setSubmissions(loadSubmissions());
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteSubmission(id);
+    } catch {
+      setLoadError(true);
+    }
+    await refresh();
     setDeletingId(null);
     if (viewingId === id) setViewingId(null);
   };
@@ -72,9 +94,9 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {submissions.length === 0 && (
               <Button
                 variant="secondary"
-                onClick={() => {
+                onClick={async () => {
                   const count = loadSeedData();
-                  if (count > 0) setSubmissions(loadSubmissions());
+                  if (count > 0) await refresh();
                 }}
               >
                 Load Demo Data
@@ -83,10 +105,10 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
             {submissions.length > 0 && (
               <Button
                 variant="ghost"
-                onClick={() => {
+                onClick={async () => {
                   if (confirm('Clear all submissions? This cannot be undone.')) {
                     clearAllSubmissions();
-                    setSubmissions([]);
+                    await refresh();
                   }
                 }}
               >
@@ -133,7 +155,17 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         </div>
 
         {/* Table */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="card text-center py-12">
+            <p className="text-muted-foreground">Loading submissions…</p>
+          </div>
+        ) : loadError ? (
+          <div className="card text-center py-12">
+            <p className="text-destructive font-medium">
+              Couldn't load submissions. Please refresh the page.
+            </p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="card text-center py-12">
             <p className="text-muted-foreground">
               {submissions.length === 0

@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type {
   SurveyState,
@@ -42,6 +42,7 @@ const initialState: SurveyState = {
   currentStep: 0,
   returnToStep: null,
   startedAt: null,
+  submitError: null,
 };
 
 function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
@@ -107,6 +108,9 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
         returnToStep: action.returnTo ?? null,
       };
 
+    case 'SET_SUBMIT_ERROR':
+      return { ...state, submitError: action.error };
+
     case 'RESET':
       return initialState;
 
@@ -117,8 +121,12 @@ function surveyReducer(state: SurveyState, action: SurveyAction): SurveyState {
 
 function App() {
   const [state, dispatch] = useReducer(surveyReducer, initialState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
     const scores = calculateScores(state);
     const assignment = determineAssignedPod(scores, state);
 
@@ -162,8 +170,22 @@ function App() {
       version: 'v1' as const,
     };
 
-    saveSubmission(record);
-    dispatch({ type: 'NEXT_STEP' });
+    const result = await saveSubmission(record);
+    setIsSubmitting(false);
+
+    if (result.ok) {
+      dispatch({ type: 'SET_SUBMIT_ERROR', error: null });
+      dispatch({ type: 'NEXT_STEP' });
+      return;
+    }
+
+    if (result.reason === 'duplicate') {
+      dispatch({ type: 'SET_SUBMIT_ERROR', error: 'duplicate' });
+      dispatch({ type: 'GO_TO_STEP', step: 1 });
+      return;
+    }
+
+    dispatch({ type: 'SET_SUBMIT_ERROR', error: 'error' });
   };
 
   const handleEdit = (step: number) => {
@@ -187,6 +209,10 @@ function App() {
             <InfoStep
               key="info"
               info={state.info}
+              submitError={state.submitError}
+              onClearSubmitError={() =>
+                dispatch({ type: 'SET_SUBMIT_ERROR', error: null })
+              }
               onUpdate={(payload) => dispatch({ type: 'SET_INFO', payload })}
               onNext={() => dispatch({ type: 'NEXT_STEP' })}
               onBack={() => dispatch({ type: 'PREV_STEP' })}
@@ -249,6 +275,8 @@ function App() {
             <ReviewStep
               key="review"
               state={state}
+              isSubmitting={isSubmitting}
+              submitError={state.submitError}
               onEdit={handleEdit}
               onSubmit={handleSubmit}
               onBack={() => dispatch({ type: 'PREV_STEP' })}

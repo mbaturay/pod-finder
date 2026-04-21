@@ -22,7 +22,7 @@ POD Finder is a single-page React application that guides users through a multi-
 - **Vite** for fast development and building
 - **Tailwind CSS** for styling
 - **Framer Motion** for animations
-- **No backend required** - runs entirely in the browser
+- **Supabase (Postgres)** for shared submission storage
 
 ## Prerequisites
 
@@ -43,15 +43,45 @@ POD Finder is a single-page React application that guides users through a multi-
    npm install
    ```
 
-3. **Start the development server**
+3. **Configure environment**
+
+   Copy `.env.example` to `.env.local` and fill in the two Supabase values
+   (see the Database setup section below).
+
+4. **Start the development server**
 
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
 
    Navigate to `http://localhost:5173` (or the URL shown in your terminal)
+
+## Database setup
+
+Submissions are stored in a shared Supabase Postgres table. Setup:
+
+1. In the Vercel dashboard for this project, open **Integrations → Marketplace**
+   and provision a **Supabase** project. This auto-injects
+   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` into Production, Preview,
+   and Development environments.
+2. In the Supabase project, open the **SQL editor** and run the migration at
+   `supabase/migrations/0001_init.sql` once. It creates the `submissions`
+   table, the `person_key` unique constraint, and RLS policies.
+3. For local development, copy the same two env vars into `.env.local`
+   (from Supabase → Project Settings → API):
+   ```
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_ANON_KEY=...
+   ```
+
+**Known limitation:** the admin UI still uses a hardcoded password
+(`AdminLogin.tsx`) and the RLS policies let anon clients insert, select, and
+delete rows. This is intentional for now and is called out in a comment at
+the top of `AdminLogin.tsx`. Before exposing the app more broadly, migrate
+admin to Supabase Auth and restrict the `select` and `delete` policies to
+authenticated users.
 
 ## Available Scripts
 
@@ -136,7 +166,7 @@ The POD with the highest FinalScore is assigned to the user.
 - ✅ **Validation** - Prevents advancing without completing required fields
 - ✅ **Detailed Breakdown** - Shows transparent scoring for all PODs
 - ✅ **Accessible** - Keyboard navigation and semantic HTML
-- ✅ **No External Dependencies** - Runs entirely locally, no auth/database needed
+- ✅ **Shared Database** - Submissions persist to Supabase Postgres so admins see everyone's data
 
 ## Customization
 

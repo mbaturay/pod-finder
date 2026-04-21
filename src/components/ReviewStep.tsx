@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion';
 import { Button } from './Button';
-import type { SurveyState } from '../types';
+import type { SurveyState, SubmitErrorKind } from '../types';
 import { PODS, POD_IDS } from '../config/pods';
 
 interface ReviewStepProps {
   state: SurveyState;
+  isSubmitting?: boolean;
+  submitError?: SubmitErrorKind | null;
   onEdit: (step: number) => void;
   onSubmit: () => void;
   onBack: () => void;
@@ -12,10 +14,13 @@ interface ReviewStepProps {
 
 export function ReviewStep({
   state,
+  isSubmitting = false,
+  submitError = null,
   onEdit,
   onSubmit,
   onBack,
 }: ReviewStepProps) {
+  const showGenericError = submitError === 'error';
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -100,12 +105,20 @@ export function ReviewStep({
           </Section>
         </div>
 
+        {showGenericError && (
+          <div className="mt-6 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+            <p className="text-sm text-destructive font-medium">
+              We couldn't save your submission. Please try again in a moment.
+            </p>
+          </div>
+        )}
+
         <div className="flex justify-between mt-8">
-          <Button variant="secondary" onClick={onBack}>
+          <Button variant="secondary" onClick={onBack} disabled={isSubmitting}>
             Back
           </Button>
-          <Button onClick={onSubmit}>
-            Submit
+          <Button onClick={onSubmit} disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting…' : 'Submit'}
           </Button>
         </div>
       </div>

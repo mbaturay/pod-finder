@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from './Button';
-import type { InfoState, Region } from '../types';
+import type { InfoState, Region, SubmitErrorKind } from '../types';
 import { normalizePersonKey, checkPersonKeyExists } from '../utils/storage';
 
 interface InfoStepProps {
   info: InfoState;
+  submitError: SubmitErrorKind | null;
+  onClearSubmitError: () => void;
   onUpdate: (payload: Partial<InfoState>) => void;
   onNext: () => void;
   onBack: () => void;
@@ -13,30 +15,51 @@ interface InfoStepProps {
 
 const REGIONS: Region[] = ['West', 'Central', 'East'];
 
-export function InfoStep({ info, onUpdate, onNext, onBack }: InfoStepProps) {
+export function InfoStep({
+  info,
+  submitError,
+  onClearSubmitError,
+  onUpdate,
+  onNext,
+  onBack,
+}: InfoStepProps) {
   const [duplicateError, setDuplicateError] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [checkError, setCheckError] = useState(false);
 
   const isValid =
     info.firstName.trim().length >= 2 &&
     info.lastName.trim().length >= 2 &&
     info.region !== null;
 
-  const handleContinue = () => {
-    if (!isValid || !info.region) return;
+  const showDuplicateBanner = duplicateError || submitError === 'duplicate';
 
-    const personKey = normalizePersonKey(info.firstName, info.lastName, info.region);
-    if (checkPersonKeyExists(personKey)) {
-      setDuplicateError(true);
-      return;
+  const handleContinue = async () => {
+    if (!isValid || !info.region || checking) return;
+
+    setChecking(true);
+    setCheckError(false);
+    try {
+      const personKey = normalizePersonKey(info.firstName, info.lastName, info.region);
+      const exists = await checkPersonKeyExists(personKey);
+      if (exists) {
+        setDuplicateError(true);
+        return;
+      }
+      setDuplicateError(false);
+      onClearSubmitError();
+      onNext();
+    } catch {
+      setCheckError(true);
+    } finally {
+      setChecking(false);
     }
-
-    setDuplicateError(false);
-    onNext();
   };
 
-  // Clear duplicate error when fields change
   const handleUpdate = (payload: Partial<InfoState>) => {
     setDuplicateError(false);
+    setCheckError(false);
+    if (submitError) onClearSubmitError();
     onUpdate(payload);
   };
 
@@ -49,11 +72,19 @@ export function InfoStep({ info, onUpdate, onNext, onBack }: InfoStepProps) {
       className="max-w-3xl mx-auto"
     >
       <div className="card">
-        {duplicateError && (
+        {showDuplicateBanner && (
           <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6">
             <p className="text-sm text-destructive font-medium">
               It looks like you've already completed this survey.
               If something needs to change, please contact your administrator.
+            </p>
+          </div>
+        )}
+
+        {checkError && !showDuplicateBanner && (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6">
+            <p className="text-sm text-destructive font-medium">
+              Something went wrong checking your info. Please try again.
             </p>
           </div>
         )}
@@ -128,15 +159,15 @@ export function InfoStep({ info, onUpdate, onNext, onBack }: InfoStepProps) {
         </div>
 
         <div className="flex justify-between mt-8">
-          <Button variant="secondary" onClick={onBack}>
+          <Button variant="secondary" onClick={onBack} disabled={checking}>
             Back
           </Button>
-          <Button onClick={handleContinue} disabled={!isValid}>
-            Continue
+          <Button onClick={handleContinue} disabled={!isValid || checking}>
+            {checking ? 'Checking…' : 'Continue'}
           </Button>
         </div>
 
-        {!isValid && !duplicateError && (
+        {!isValid && !showDuplicateBanner && !checkError && (
           <p className="text-sm text-warning text-center mt-4">
             Please fill in all fields to continue
           </p>

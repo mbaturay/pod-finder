@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   LineChart, Line, ResponsiveContainer,
@@ -25,9 +25,28 @@ const DATE_RANGE_OPTIONS = [
 ];
 
 export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
-  const [allSubmissions] = useState<SubmissionRecord[]>(loadSubmissions);
+  const [allSubmissions, setAllSubmissions] = useState<SubmissionRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [regionFilter, setRegionFilter] = useState<Region | ''>('');
   const [dateRange, setDateRange] = useState(30);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await loadSubmissions();
+        if (!cancelled) setAllSubmissions(rows);
+      } catch {
+        if (!cancelled) setLoadError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     let subs = filterByRegion(allSubmissions, regionFilter);
@@ -108,7 +127,35 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
     });
   }, [filtered]);
 
-  // Empty state
+  // Loading / error / empty states
+  if (loading) {
+    return (
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <TopBar onLogout={onLogout} />
+          <div className="card text-center py-16">
+            <p className="text-muted-foreground text-lg">Loading analytics…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <TopBar onLogout={onLogout} />
+          <div className="card text-center py-16">
+            <p className="text-destructive font-medium">
+              Couldn't load analytics. Please refresh the page.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (allSubmissions.length === 0) {
     return (
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">

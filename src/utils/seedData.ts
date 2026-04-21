@@ -1,3 +1,8 @@
+// NOTE: this module still writes to localStorage. Real submissions now live in
+// Supabase (see src/utils/storage.ts). This seed path is out of sync with the
+// real data source and is effectively dead code — the admin dashboard reads
+// from Supabase and will not show records inserted here. Kept in place for
+// future rework. Do not rely on it for demo data.
 import type { SubmissionRecord, PodId, LikertValue, Region, GrowthFocusArea, ScoreBreakdown } from '../types';
 import { PODS, POD_IDS, GROWTH_AREA_MAPPING } from '../config/pods';
 

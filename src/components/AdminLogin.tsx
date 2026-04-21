@@ -1,3 +1,7 @@
+// SECURITY: admin auth is a hardcoded password check that runs in the
+// browser. This is a known gap — the anon Supabase key + permissive RLS
+// policies mean any client can read/delete submissions regardless of this
+// check. Migrate to Supabase Auth and tighten RLS before exposing publicly.
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from './Button';
