@@ -20,7 +20,7 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
             Crafting our Product Design practice, together
           </h1>
           <p className="text-lg text-muted-foreground">
-            It takes a village. We need your help to succeed
+            It takes a village. We need your help to succeed.
           </p>
         </div>
 
