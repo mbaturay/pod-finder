@@ -62,7 +62,7 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
 
   // Sessions longer than this are treated as "walked away / left the tab open"
   // and excluded from completion-time stats so they don't skew the average.
-  const MAX_PLAUSIBLE_DURATION_MIN = 10;
+  const MAX_PLAUSIBLE_DURATION_MIN = 12;
   const durations = filtered
     .map((s) => s.computed.durationMinutes)
     .filter((d): d is number => d != null && d > 0 && d <= MAX_PLAUSIBLE_DURATION_MIN);
