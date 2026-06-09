@@ -22,7 +22,7 @@ const DATE_RANGE_OPTIONS = [
   { label: '7 days', value: 7 },
   { label: '14 days', value: 14 },
   { label: '30 days', value: 30 },
-  { label: '60 days', value: 60 },
+  { label: '75 days', value: 75 },
 ];
 
 export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
@@ -30,7 +30,7 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [regionFilter, setRegionFilter] = useState<Region | ''>('');
-  const [dateRange, setDateRange] = useState(60);
+  const [dateRange, setDateRange] = useState(75);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,9 +60,12 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
   const multiFitCount = filtered.filter((s) => s.computed.isMultiFit).length;
   const multiFitRate = totalCount > 0 ? (multiFitCount / totalCount) * 100 : 0;
 
+  // Sessions longer than this are treated as "walked away / left the tab open"
+  // and excluded from completion-time stats so they don't skew the average.
+  const MAX_PLAUSIBLE_DURATION_MIN = 10;
   const durations = filtered
     .map((s) => s.computed.durationMinutes)
-    .filter((d): d is number => d != null && d > 0);
+    .filter((d): d is number => d != null && d > 0 && d <= MAX_PLAUSIBLE_DURATION_MIN);
   const avgDuration = average(durations);
   const medDuration = median(durations);
 
@@ -213,12 +216,12 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
           <StatCard label="Total Submissions" value={String(totalCount)} />
           <StatCard label="Multi-fit Rate" value={`${multiFitRate.toFixed(1)}%`} />
           <StatCard
-            label="Avg Completion"
-            value={durations.length > 0 ? `${avgDuration.toFixed(1)} min` : '—'}
-          />
-          <StatCard
             label="Median Completion"
             value={durations.length > 0 ? `${medDuration.toFixed(1)} min` : '—'}
+          />
+          <StatCard
+            label="Avg Completion"
+            value={durations.length > 0 ? `${avgDuration.toFixed(1)} min` : '—'}
           />
         </div>
 
