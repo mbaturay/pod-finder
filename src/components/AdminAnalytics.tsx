@@ -22,6 +22,7 @@ const DATE_RANGE_OPTIONS = [
   { label: '7 days', value: 7 },
   { label: '14 days', value: 14 },
   { label: '30 days', value: 30 },
+  { label: '60 days', value: 60 },
 ];
 
 export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
@@ -29,7 +30,7 @@ export function AdminAnalytics({ onLogout }: AdminAnalyticsProps) {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [regionFilter, setRegionFilter] = useState<Region | ''>('');
-  const [dateRange, setDateRange] = useState(30);
+  const [dateRange, setDateRange] = useState(60);
 
   useEffect(() => {
     let cancelled = false;
